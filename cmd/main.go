@@ -21,7 +21,6 @@ func main() {
 		middleware.Chain(
 			endpoints.Heartbeat,
 			middleware.LogRequest(),
-			middleware.LogResponse(),
 		))
 
 	/* Setup server*/
