@@ -6,7 +6,7 @@ DEV_IMAGE_NAME ?= boshi-backend-dev
 
 DEV ?= true
 TAG ?= latest
-IMAGE_NAME ?= $(shell if [ "$(DEV)" = "false" ]; then echo $(PROD_IMAGE_NAME); else echo $(DEV_IMAGE_NAME); fi)makefile
+IMAGE_NAME ?= $(shell if [ "$(DEV)" = "false" ]; then echo $(PROD_IMAGE_NAME); else echo $(DEV_IMAGE_NAME); fi)
 BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
 
 all: build

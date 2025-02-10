@@ -13,6 +13,7 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
   build:
+    needs: login
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -21,6 +22,7 @@ jobs:
     - name: Push image with commit sha
       run: make docker-push TAG=$(git rev-parse --short "$GITHUB_SHA")
   deploy:
+    needs: build
     name: Rollout deployment
     runs-on: ubuntu-latest
     steps:

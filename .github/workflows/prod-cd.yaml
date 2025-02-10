@@ -13,6 +13,7 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
   build:
+    needs: login
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -23,6 +24,7 @@ jobs:
     - name: Push image with latest tag
       run: make docker-push TAG=latest
   deploy:
+    needs: build
     name: Rollout deployment
     runs-on: ubuntu-latest
     steps:
