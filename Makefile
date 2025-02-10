@@ -1,11 +1,12 @@
-.PHONY: all run clean build help
+.PHONY: all run docker-push docker clean build help
 
-include .env
-export
+DOCKER_REGISTRY ?= matthew10125
+PROD_IMAGE_NAME ?= boshi-backend
+DEV_IMAGE_NAME ?= boshi-backend-dev
 
 DEV ?= true
 TAG ?= latest
-IMAGE_NAME ?= $(shell if [ "$(DEV)" = "false" ]; then echo $(PROD_IMAGE_NAME); else echo $(DEV_IMAGE_NAME); fi)
+IMAGE_NAME ?= $(shell if [ "$(DEV)" = "false" ]; then echo $(PROD_IMAGE_NAME); else echo $(DEV_IMAGE_NAME); fi)makefile
 BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
 
 all: build
