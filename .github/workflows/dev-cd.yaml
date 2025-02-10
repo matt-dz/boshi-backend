@@ -16,6 +16,8 @@ jobs:
       run: make docker
     - name: Push image with commit sha
       run: make docker-push TAG=$(git rev-parse --short "$GITHUB_SHA")
+    - name: Push image with latest tag
+      run: make docker-push TAG=latest
   deploy:
     needs: build
     name: Rollout deployment
