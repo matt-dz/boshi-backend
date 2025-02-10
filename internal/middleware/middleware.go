@@ -4,10 +4,16 @@ import (
 	"boshi-backend/internal/logger"
 	"context"
 	"net/http"
+	"time"
 )
 
 var bLogger = logger.GetLogger()
 var ctx = context.Background()
+
+type logResponseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
 
 type Middleware func(http.HandlerFunc) http.HandlerFunc
 
@@ -25,20 +31,18 @@ func Chain(h http.HandlerFunc, m ...Middleware) http.HandlerFunc {
 	return h
 }
 
+func (lrw *logResponseWriter) WriteHeader(code int) {
+	lrw.statusCode = code
+	lrw.ResponseWriter.WriteHeader(code)
+}
+
 func LogRequest() Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			bLogger.InfoContext(ctx, "Request received", "method", r.Method, "url", r.URL.String())
-			next.ServeHTTP(w, r)
-		}
-	}
-}
-
-func LogResponse() Middleware {
-	return func(next http.HandlerFunc) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
-			next.ServeHTTP(w, r)
-			bLogger.InfoContext(ctx, "Response sent", "status", w.Header().Get("Status"))
+			start := time.Now()
+			lrw := &logResponseWriter{w, http.StatusOK}
+			next.ServeHTTP(lrw, r)
+			bLogger.InfoContext(ctx, "Request received", "method", r.Method, "endpoint", r.URL, "status", lrw.statusCode, "duration", time.Since(start).String())
 		}
 	}
 }
