@@ -3,7 +3,7 @@ on:
   push:
     branches: [ "main" ]
 env:
-  DEV="false"
+  DEV: "false"
 jobs:
   build:
     runs-on: ubuntu-latest
