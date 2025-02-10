@@ -2,6 +2,8 @@ name: Production CD
 on:
   push:
     branches: [ "main" ]
+env:
+  DEV="false"
 jobs:
   build:
     runs-on: ubuntu-latest
