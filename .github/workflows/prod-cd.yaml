@@ -16,8 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: configure
-      run: ./configure
     - name: Build image
       run: make docker
     - name: Push image with commit sha
