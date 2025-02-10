@@ -15,7 +15,8 @@ jobs:
       run: make docker
     - name: Push image with commit sha
       uses: actions/checkout@v4
-      run: make docker-push TAG=$(git rev-parse --short "$GITHUB_SHA")
+      with:
+        script: make docker-push TAG=$(git rev-parse --short "$GITHUB_SHA")
     - name: Push image with latest tag
       run: make docker-push TAG=latest
   deploy:
