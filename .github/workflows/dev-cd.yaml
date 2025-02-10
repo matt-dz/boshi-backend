@@ -1,9 +1,9 @@
-name: Production CD
+name: Development CD
 on:
   push:
     branches: [ "dev" ]
 jobs:
-  login:
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
