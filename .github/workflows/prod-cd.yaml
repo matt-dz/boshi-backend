@@ -1,4 +1,4 @@
-name: Makefile CI
+name: Production CD
 on:
   push:
     branches: [ "main" ]
