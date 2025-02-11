@@ -8,6 +8,7 @@ DEV ?= true
 TAG ?= latest
 IMAGE_NAME ?= $(shell if [ "$(DEV)" = "false" ]; then echo $(PROD_IMAGE_NAME); else echo $(DEV_IMAGE_NAME); fi)
 BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
+PLATFORM ?= linux/arm64
 
 all: build
 
@@ -27,7 +28,7 @@ docker-push:
 
 docker:
 	@echo "Building $(BUILD_NAME)..."
-	docker build -t $(BUILD_NAME) .
+	docker buildx build --platform $(PLATFORM) -t $(BUILD_NAME) .
 
 clean:
 	@echo "Cleaning bin directory..."
