@@ -1,4 +1,4 @@
-name: Pull Request Push
+name: Delete Deployment
 on:
   pull_request:
     branches-ignore:
