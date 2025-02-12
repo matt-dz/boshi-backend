@@ -1,9 +1,6 @@
 name: Update Deployment
 on:
   pull_request:
-    branches-ignore:
-      - dev
-      - main
     types: [synchronize]
   push:
     branches: ["main", "dev"]
