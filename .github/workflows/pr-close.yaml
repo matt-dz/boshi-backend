@@ -16,7 +16,7 @@ jobs:
             BRANCH_NAME: "${{ github.head_ref || github.ref_name }}"
         run: |
           output=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
-          echo "name=$output" >> $GITHUB_ENV
+          echo "name=$output" >> $GITHUB_OUTPUT
   delete:
     needs: [build, convert-branch-name]
     name: Delete Deployment Resources
