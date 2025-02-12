@@ -54,10 +54,10 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           envs: BRANCH_NAME
-          script: |
-            if [[ $BRANCH_NAME == "main" ]]; then \
-              kubectl rollout restart deployment boshi-backend -n boshi \
-            else \
-              kubectl rollout restart deployment boshi-backend -n boshi-$BRANCH_NAME \
+          script: >-
+            if [[ $BRANCH_NAME == "main" ]]; then
+              kubectl rollout restart deployment boshi-backend -n boshi
+            else
+              kubectl rollout restart deployment boshi-backend -n boshi-$BRANCH_NAME
             fi
 
