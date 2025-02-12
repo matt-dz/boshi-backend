@@ -17,22 +17,22 @@ jobs:
         run: |
           output=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
           echo "name=$output" >> $GITHUB_ENV
-  # delete:
-  #   needs: [build, convert-branch-name]
-  #   name: Delete Deployment Resources
-  #   runs-on: ubuntu-latest
-  #   env:
-  #       BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
-  #   steps:
-  #     - name: Delete Deployment
-  #       uses: appleboy/ssh-action@v1.2.0
-  #       with:
-  #         host: ${{ secrets.SSH_HOST }}
-  #         username: ${{ secrets.SSH_USERNAME }}
-  #         key: ${{ secrets.SSH_KEY }}
-  #         port: ${{ secrets.SSH_PORT }}
-  #         script: |
-  #           kubectl delete deployment boshi-backend -n boshi-$BRANCH_NAME
-  #           kubectl delete svc boshi-svc -n boshi-$BRANCH_NAME
-  #           kubectl delete ingress ingress -n boshi-$BRANCH_NAME
-  #           kubectl delete namespace boshi-$BRANCH_NAME
+  delete:
+    needs: [build, convert-branch-name]
+    name: Delete Deployment Resources
+    runs-on: ubuntu-latest
+    env:
+        BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
+    steps:
+      - name: Delete Deployment
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            kubectl delete deployment boshi-backend -n boshi-$BRANCH_NAME
+            kubectl delete svc boshi-svc -n boshi-$BRANCH_NAME
+            kubectl delete ingress ingress -n boshi-$BRANCH_NAME
+            kubectl delete namespace boshi-$BRANCH_NAME
