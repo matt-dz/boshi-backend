@@ -49,6 +49,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: |
+          run: |
             kubectl rollout restart deployment boshi-backend -n boshi-$BRANCH_NAME
 

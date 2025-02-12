@@ -56,7 +56,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: |
+          run: |
             kubectl create namespace boshi-$BRANCH_NAME
             kubectl create deployment boshi-backend --image=boshi-backend:$BRANCH_NAME-latest --port=80 -n boshi-$BRANCH_NAME
             kubectl create service clusterip boshi-svc --tcp=80:80 -n boshi-$BRANCH_NAME
