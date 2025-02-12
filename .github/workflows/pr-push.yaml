@@ -39,16 +39,17 @@ jobs:
     needs: [build, convert-branch-name]
     name: Create Deployment
     runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
     steps:
       - name: Rollout deployment
         uses: appleboy/ssh-action@v1.2.0
-        envs:
-        - BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          envs: BRANCH_NAME
           run: |
             kubectl rollout restart deployment boshi-backend -n boshi-$BRANCH_NAME
 
