@@ -1,9 +1,6 @@
 name: Delete Deployment
 on:
   pull_request:
-    branches-ignore:
-      - dev
-      - main
     types: [closed]
 jobs:
   convert-branch-name:
