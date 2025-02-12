@@ -46,8 +46,6 @@ jobs:
     needs: [build, convert-branch-name]
     name: Create Deployment
     runs-on: ubuntu-latest
-    env:
-        BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
     steps:
       - name: Create Deployment
         uses: appleboy/ssh-action@v1.2.0
@@ -56,7 +54,9 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          run: |
+          envs:
+          - BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
+          script: |
             kubectl create namespace boshi-$BRANCH_NAME
             kubectl create deployment boshi-backend --image=boshi-backend:$BRANCH_NAME-latest --port=80 -n boshi-$BRANCH_NAME
             kubectl create service clusterip boshi-svc --tcp=80:80 -n boshi-$BRANCH_NAME
