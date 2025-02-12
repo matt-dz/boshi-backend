@@ -33,7 +33,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           envs: BRANCH_NAME
           script: |
-            kubectl delete deployment boshi-backend -n boshi-$BRANCH_NAME
-            kubectl delete svc boshi-svc -n boshi-$BRANCH_NAME
-            kubectl delete ingress ingress -n boshi-$BRANCH_NAME
             kubectl delete namespace boshi-$BRANCH_NAME
