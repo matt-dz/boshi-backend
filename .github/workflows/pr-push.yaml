@@ -5,6 +5,8 @@ on:
       - dev
       - main
     types: [synchronize]
+  push:
+    branches: ["main", "dev"]
 jobs:
   convert-branch-name:
     runs-on: ubuntu-latest
@@ -34,7 +36,12 @@ jobs:
     - name: Push image with commit sha
       run: make docker-push TAG=$BRANCH_NAME-$(git rev-parse --short "$GITHUB_SHA")
     - name: Push image with latest tag
-      run: make docker-push TAG=$BRANCH_NAME-latest
+      run: |
+        if [[ $BRANCH_NAME == "main" ]]; then \
+          make docker-push TAG=latest \
+        else \
+          make docker-push TAG=$BRANCH_NAME-latest \
+        fi
   deploy:
     needs: [build, convert-branch-name]
     name: Create Deployment
@@ -50,6 +57,10 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           envs: BRANCH_NAME
-          run: |
-            kubectl rollout restart deployment boshi-backend -n boshi-$BRANCH_NAME
+          script: |
+            if [[ $BRANCH_NAME == "main" ]]; then \
+              kubectl rollout restart deployment boshi-backend -n boshi \
+            else \
+              kubectl rollout restart deployment boshi-backend -n boshi-$BRANCH_NAME \
+            fi
 

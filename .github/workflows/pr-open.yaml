@@ -1,6 +1,9 @@
 name: Create Deployment
 on:
   pull_request:
+    branches-ignore:
+      - dev
+      - main
     types: [opened, reopened]
 env:
  BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
@@ -61,6 +64,5 @@ jobs:
           script: |
             kubectl create namespace boshi-$BRANCH_NAME
             kubectl create deployment boshi-backend --image=$REGISTRY/boshi-backend:$BRANCH_NAME-latest --port=80 -n boshi-$BRANCH_NAME
-            kubectl create service clusterip boshi-svc --tcp=80:80 -n boshi-$BRANCH_NAME
             kubectl expose deployment boshi-backend --name=boshi-svc --port=80 --target-port=80 --type=ClusterIP -n boshi-$BRANCH_NAME
             kubectl create ingress ingress --class=nginx --rule="$BRANCH_NAME-api-boshi.deguzman.cloud/=boshi-svc:80,tls=boshi-tls" -n boshi-$BRANCH_NAME

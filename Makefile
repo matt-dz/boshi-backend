@@ -1,12 +1,8 @@
 .PHONY: all run docker-push docker clean build help
 
 DOCKER_REGISTRY ?= matthew10125
-PROD_IMAGE_NAME ?= boshi-backend
-DEV_IMAGE_NAME ?= boshi-backend-dev
-
-DEV ?= true
+IMAGE_NAME ?= boshi-backend
 TAG ?= latest
-IMAGE_NAME ?= $(shell if [ "$(DEV)" = "false" ]; then echo $(PROD_IMAGE_NAME); else echo $(DEV_IMAGE_NAME); fi)
 BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
 PLATFORM ?= linux/arm64
 
