@@ -1,9 +1,6 @@
 name: Create Deployment
 on:
   pull_request:
-    branches-ignore:
-      - dev
-      - main
     types: [opened, reopened]
 env:
  BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
