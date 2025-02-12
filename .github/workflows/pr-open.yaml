@@ -15,6 +15,8 @@ jobs:
             BRANCH_NAME: "${{ github.head_ref || github.ref_name }}"
         run: |
           output=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
+          echo "original branch name: $BRANCH_NAME"
+          echo "converted branch name: $output"
           echo "name=$output" >> $GITHUB_ENV
   build:
     runs-on: ubuntu-latest
