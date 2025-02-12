@@ -48,7 +48,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
-    env:
       REGISTRY: ${{ vars.DOCKERHUB_USERNAME }}
     steps:
       - name: Create Deployment
