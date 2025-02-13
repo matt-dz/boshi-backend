@@ -28,4 +28,10 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           envs: BRANCH_NAME
-          script: kubectl delete namespace boshi-$BRANCH_NAME
+          script: |
+            export NAMESPACE="boshi-$BRANCH_NAME"
+            if kubectl get namespace $NAMESPACE >/dev/null 2>&1; then
+              kubectl delete namespace $NAMESPACE
+            else
+              echo "Namespace '$NAMESPACE' not found. Not deleting anything."
+            fi
