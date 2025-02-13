@@ -8,6 +8,11 @@ jobs:
     outputs:
       changes: ${{ steps.filter.outputs.src }}
     steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+      with:
+        path: ${{ github.workspace }}/src/github.com/${{ github.repository }}
+        fetch-depth: 1
     - uses: dorny/paths-filter@v3
       id: filter
       with:
@@ -87,3 +92,4 @@ jobs:
               kubectl expose deployment boshi-backend --name=boshi-svc --port=80 --target-port=80 --type=ClusterIP -n $NAMESPACE
               kubectl create ingress ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$BRANCH_NAME-api-boshi.deguzman.cloud/*=boshi-svc:80,tls=boshi-tls" -n $NAMESPACE
             fi
+
