@@ -23,6 +23,12 @@ func main() {
 			middleware.LogRequest(),
 		))
 
+	mux.HandleFunc("/oauth-metadata.json",
+		middleware.Chain(
+			endpoints.ServeOauthMetadata,
+			middleware.LogRequest(),
+		))
+
 	/* Setup server*/
 	port := os.Getenv("PORT")
 	if port == "" {
