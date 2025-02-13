@@ -23,7 +23,7 @@ func main() {
 			middleware.LogRequest(),
 		))
 
-	mux.HandleFunc("/oauth-metadata.json",
+	mux.HandleFunc("/client-metadata.json",
 		middleware.Chain(
 			endpoints.ServeOauthMetadata,
 			middleware.LogRequest(),
