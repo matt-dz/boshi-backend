@@ -41,6 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
+      REGISTRY: ${{ vars.DOCKER_REGISTRY }}
     steps:
       - name: Rollout deployment
         uses: appleboy/ssh-action@v1.2.0
@@ -49,7 +50,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: BRANCH_NAME
+          envs: BRANCH_NAME,REGISTRY
           script: |-
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
