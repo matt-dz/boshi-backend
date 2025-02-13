@@ -5,5 +5,5 @@ import (
 )
 
 func ServeOauthMetadata(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "/srv/oauth-metadata.json")
+	http.ServeFile(w, r, "/srv/client-metadata.json")
 }
