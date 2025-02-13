@@ -57,7 +57,7 @@ jobs:
               export NAMESPACE="boshi-$BRANCH_NAME";
             fi
 
-            if kubectl get namespace $1 >/dev/null 2>&1; then
+            if kubectl get namespace $BRANCH_NAME >/dev/null 2>&1; then
               echo "Namespace exists"
               # kubectl rollout restart deployment boshi-backend -n $NAMESPACE
             else
