@@ -1,4 +1,4 @@
-FROM golang:alpine as build
+FROM --platform=$BUILDPLATFORM golang:alpine as build
 WORKDIR /app
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o bin/boshi-backend cmd/main.go
