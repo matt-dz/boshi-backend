@@ -1,16 +1,15 @@
-name: Delete Deployment
-on:
-  pull_request:
-    types: [closed]
+name: Branch Deleted
+on: delete
 jobs:
   convert-branch-name:
+    if: github.event.ref_type == 'branch'
     runs-on: ubuntu-latest
     outputs:
       name: ${{ steps.convert.outputs.name }}
     steps:
       - id: convert
         env:
-            BRANCH_NAME: "${{ github.head_ref || github.ref_name }}"
+            BRANCH_NAME: "${{ github.head_ref || github.ref_name || github.event.ref }}"
         run: |
           output=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
           echo "name=$output" >> $GITHUB_OUTPUT
@@ -29,5 +28,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           envs: BRANCH_NAME
-          script: |
-            kubectl delete namespace boshi-$BRANCH_NAME
+          script: kubectl delete namespace boshi-$BRANCH_NAME
