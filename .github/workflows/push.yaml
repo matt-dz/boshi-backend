@@ -8,11 +8,7 @@ jobs:
     outputs:
       changes: ${{ steps.filter.outputs.src }}
     steps:
-    - name: Check out code
-      uses: actions/checkout@v4
-      with:
-        path: ${{ github.workspace }}/src/github.com/${{ github.repository }}
-        fetch-depth: 1
+    - uses: actions/checkout@v4
     - uses: dorny/paths-filter@v3
       id: filter
       with:
