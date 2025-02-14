@@ -1,8 +1,8 @@
 {
-	"client_id": "https://api-boshi.deguzman.cloud/client-metadata.json",
+	"client_id": "https://<URL>.deguzman.cloud/client-metadata.json",
 	"client_name": "Boshi",
-	"client_uri": "https://api-boshi.deguzman.cloud",
-	"redirect_uris": ["https://api-boshi.deguzman.cloud/"],
+	"client_uri": "https://<URL>.deguzman.cloud",
+	"redirect_uris": ["https://<URL>.deguzman.cloud/"],
 	"grant_types": ["authorization_code", "refresh_token"],
 	"scope": "atproto",
 	"response_types": ["code"],
