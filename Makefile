@@ -22,9 +22,11 @@ docker-push:
 	@echo "Pushing $(BUILD_NAME):$(TAG)..."
 	docker push $(BUILD_NAME):$(TAG)
 
+
 docker:
 	@echo "Building $(BUILD_NAME)..."
-	docker buildx build --platform $(PLATFORM) -t $(BUILD_NAME) .
+	subdomain=$$(scripts/generate-subdomain.sh) && \
+		docker buildx build --build-arg SUBDOMAIN=$${subdomain} --platform $(PLATFORM) -t $(BUILD_NAME) .
 
 clean:
 	@echo "Cleaning bin directory..."
