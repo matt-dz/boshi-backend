@@ -1,5 +1,5 @@
 # Generate client-metadata.json for OAuth2
-FROM debian:bookworm as oauth
+FROM --platform=$BUILDPLATFORM debian:bookworm-slim as oauth
 ARG SUBDOMAIN
 WORKDIR /app
 COPY scripts/generate-client-metadata.sh .
