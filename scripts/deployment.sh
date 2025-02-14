@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 
 if [[ $BRANCH_NAME == "main" ]]; then
