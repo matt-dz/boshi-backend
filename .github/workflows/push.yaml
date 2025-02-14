@@ -73,7 +73,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           envs: BRANCH_NAME,REGISTRY
-          script_path: scripts/deployment.sh
           script: |
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
