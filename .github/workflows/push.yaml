@@ -65,7 +65,7 @@ jobs:
       BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
       REGISTRY: ${{ vars.DOCKER_REGISTRY }}
     steps:
-      - name: Create Deployment
+      - name: Create/Update Deployment
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -73,7 +73,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           envs: BRANCH_NAME,REGISTRY
-          script: |-
+          script: |
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
             else
@@ -88,4 +88,3 @@ jobs:
               kubectl expose deployment boshi-backend --name=boshi-svc --port=80 --target-port=80 --type=ClusterIP -n $NAMESPACE
               kubectl create ingress ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$BRANCH_NAME-api-boshi.deguzman.cloud/*=boshi-svc:80,tls=boshi-tls" -n $NAMESPACE
             fi
-
