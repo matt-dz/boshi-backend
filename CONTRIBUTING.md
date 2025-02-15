@@ -39,8 +39,6 @@ We accept changes via pull requests. To submit a pull request and be sure to fil
 
 If you find a bug, please report it by creating an issue in the repository. Include as much detail as possible, including steps to reproduce the bug, expected behavior, and any relevant screenshots or error messages.
 
-**Note**: For any critical bugs, please email the maintainers directly. [matthew.deguzman0613@gmail.com](mailto:matthew.deguzman0613@gmail.com) or [aeum1003@gmail.com](mailto:aeum1003@gmail.com).
-
 ## Core Maintainers
 
 - [Matthew DeGuzman](https://matthewdeguzman.info)
