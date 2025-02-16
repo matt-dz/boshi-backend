@@ -16,4 +16,3 @@ The source code for the Boshi application.
 ## Contributing
 
 For contributing, please refer to [CONTRIBUTING.md](CONTRIBUTING.md).
-
