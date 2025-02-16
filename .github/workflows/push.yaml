@@ -35,6 +35,7 @@ jobs:
       - id: convert
         env:
           BRANCH_NAME: "${{ github.head_ref || github.ref_name }}"
+        shell: bash
         run: |
           output=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
           echo "name=$output" >> $GITHUB_OUTPUT
@@ -56,6 +57,7 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Backend
+        shell: bash
         run: |
           echo "Building backend..."
           cd backend && make docker
@@ -85,6 +87,7 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Landing
+        shell: bash
         run: |
           echo "Building Landing"
           cd landing && make docker
@@ -115,7 +118,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: BRANCH_NAME,REGISTRY
+          envs: BRANCH_NAME,REGISTRY,COMMMIT_ID
           script: |
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
@@ -157,7 +160,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: BRANCH_NAME,REGISTRY
+          envs: BRANCH_NAME,REGISTRY,COMMMIT_ID
           script: |
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
