@@ -1,5 +1,7 @@
 .PHONY: all run docker-push docker clean build help
 
+SHELL := /bin/bash
+
 DOCKER_REGISTRY ?= matthew10125
 IMAGE_NAME ?= boshi-backend
 TAG ?= latest
@@ -25,7 +27,8 @@ docker-push:
 
 docker:
 	@echo "Building $(BUILD_NAME)..."
-	subdomain=$$(scripts/generate-subdomain.sh) && \
+	subdomain=$$(../scripts/generate-subdomain.sh) && \
+	   if [[ subdomain == "main" ]]; then subdomain="boshi"; fi && \
 		docker buildx build --build-arg SUBDOMAIN=$${subdomain} --platform $(PLATFORM) -t $(BUILD_NAME) .
 
 clean:
