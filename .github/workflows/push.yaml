@@ -112,7 +112,7 @@ jobs:
               export TAG="$BRANCH_NAME-$COMMIT_ID";
             fi
 
-            if kubectl get namespace $NAMESPACE >/dev/null 2>&1; then
+            if kubectl get deployment boshi-backend -n $NAMESPACE >/dev/null 2>&1; then
               kubectl set image deployments boshi-backend=$REGISTRY/boshi-backend:$TAG --all -n $NAMESPACE
             else
               kubectl create namespace $NAMESPACE
