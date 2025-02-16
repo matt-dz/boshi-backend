@@ -8,21 +8,19 @@ jobs:
       pull-requests: read
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
+      landing: ${{ steps.filter.outputs.landing }}
     steps:
-    - uses: actions/checkout@v4
-    - uses: dorny/paths-filter@v3
-      id: filter
-      with:
-        filters: |
-          backend:
-            - 'backend/go.mod'
-            - 'backend/cmd/**'
-            - 'backend/internal/**'
-            - 'backend/.dockerignore'
-            - 'backend/Dockerfile'
-            - 'backend/scripts/**'
-            - 'backend/configs/**'
-            - '.github/workflows/push.yaml'
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            landing:
+              - 'landing/**'
+              - '!landing/README.md'
+            backend:
+              - 'backend/**'
+              - '!backend/env.example'
 
   convert-branch-name:
     needs: changes
@@ -34,35 +32,63 @@ jobs:
     steps:
       - id: convert
         env:
-            BRANCH_NAME: "${{ github.head_ref || github.ref_name }}"
+          BRANCH_NAME: "${{ github.head_ref || github.ref_name }}"
         run: |
           output=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
           echo "name=$output" >> $GITHUB_OUTPUT
+
   build-backend:
     needs: convert-branch-name
     name: Build Backend
     runs-on: ubuntu-latest
-    if : ${{ needs.changes.outputs.backend == 'true' }}
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     env:
-        BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
+      BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
     steps:
-    - uses: actions/checkout@v4
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ vars.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Build image
-      run: cd backend && make docker
-    - name: Push image with commit sha
-      run: cd backend && make docker-push TAG=$BRANCH_NAME-$(git rev-parse --short "$GITHUB_SHA")
-    - name: Push image with latest tag
-      run: >-
-        if [[ $BRANCH_NAME == "main" ]]; then
-          cd backend && make docker-push TAG=latest
-        else
-          cd backend && make docker-push TAG=$BRANCH_NAME-latest
-        fi
+      - uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build image
+        run: cd backend && make docker
+      - name: Push image with commit sha
+        run: cd backend && make docker-push TAG=$BRANCH_NAME-$(git rev-parse --short "$GITHUB_SHA")
+      - name: Push image with latest tag
+        run: >-
+          if [[ $BRANCH_NAME == "main" ]]; then
+            cd backend && make docker-push TAG=latest
+          else
+            cd backend && make docker-push TAG=$BRANCH_NAME-latest
+          fi
+
+  build-landing:
+    needs: convert-branch-name
+    name: Build Landing
+    runs-on: ubuntu-latest
+    if: ${{ needs.changes.outputs.landing == 'true' }}
+    env:
+      BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build image
+        run: cd landing && make docker
+      - name: Push image with commit sha
+        run: cd landing && make docker-push TAG=$BRANCH_NAME-$(git rev-parse --short "$GITHUB_SHA")
+      - name: Push image with latest tag
+        run: >-
+          if [[ $BRANCH_NAME == "main" ]]; then
+            cd backend && make docker-push TAG=latest
+          else
+            cd backend && make docker-push TAG=$BRANCH_NAME-latest
+          fi
+
   deploy-backend:
     needs: [build-backend, convert-branch-name]
     name: Create Backend Deployment
@@ -71,7 +97,8 @@ jobs:
       BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
       REGISTRY: ${{ vars.DOCKER_REGISTRY }}
     steps:
-      - name: Create/Update Deployment
+      - name: Create/Update Backend Deployment
+        if: ${{ needs.changes.outputs.backend == 'true' }}
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -93,4 +120,28 @@ jobs:
               kubectl create deployment boshi-backend --image=$REGISTRY/boshi-backend:$BRANCH_NAME-latest --port=80 -n $NAMESPACE
               kubectl expose deployment boshi-backend --name=boshi-backend-svc --port=80 --target-port=80 --type=ClusterIP -n $NAMESPACE
               kubectl create ingress ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$BRANCH_NAME-boshi.deguzman.cloud/api/*=boshi-backend-svc:80,tls=boshi-tls" --rule="$BRANCH_NAME-boshi.deguzman.cloud/oauth/*=boshi-backend-svc:80,tls=boshi-tls" -n $NAMESPACE
+            fi
+      - name: Create/Update Landing Deployment
+        if: ${{ needs.changes.outputs.landing == 'true' }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          envs: BRANCH_NAME,REGISTRY
+          script: |
+            if [[ $BRANCH_NAME == "main" ]]; then
+              export NAMESPACE="boshi";
+            else
+              export NAMESPACE="boshi-$BRANCH_NAME";
+            fi
+
+            if kubectl get deployment boshi-backend -n $NAMESPACE $1 >/dev/null 2>&1; then
+              kubectl rollout restart deployment boshi-landing -n $NAMESPACE
+            else
+              kubectl create namespace $NAMESPACE
+              kubectl create deployment boshi-landing --image=$REGISTRY/boshi-landing:$BRANCH_NAME-latest --port=3000 -n $NAMESPACE
+              kubectl expose deployment boshi-landing --name=boshi-landing-svc --port=80 --target-port=3000 --type=ClusterIP -n $NAMESPACE
+              kubectl create ingress landing-ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$BRANCH_NAME-boshi-app.deguzman.cloud/*=boshi-landing-svc:80,tls=boshi-landing-tls" -n $NAMESPACE
             fi
