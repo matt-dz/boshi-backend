@@ -15,7 +15,7 @@
 			</div>
 			<div class="mt-16 flex flex-col items-center gap-4">
 				<h1 class="text-center text-lg font-extralight text-gray-300 sm:text-xl">
-					Connect, share, and explore campus life — anonymously.
+					Connect, share, and explore campus life — <span class="italic">anonymously</span>.
 				</h1>
 				<h1 class="text-center text-lg font-extralight text-gray-300 sm:text-xl">
 					Get notified when the <span class="italic">only</span>
