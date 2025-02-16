@@ -1,0 +1,14 @@
+@import 'tailwindcss';
+
+* {
+	font-family: 'Inter', serif;
+}
+
+body {
+	background-color: #101010;
+}
+
+:root {
+	--neon-blue: #00a2ff;
+	--neon-red: #ff7c77;
+}
