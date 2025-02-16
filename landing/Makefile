@@ -1,0 +1,18 @@
+.PHONY: all build docker-push
+
+DOCKER_REGISTRY ?= matthew10125
+IMAGE_NAME ?= boshi-landing
+TAG ?= latest
+BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
+PLATFORM ?= linux/arm64
+
+all: build
+
+build:
+	@echo "Building $(BUILD_NAME)"
+	docker buildx build --platform $(PLATFORM) -t $(BUILD_NAME) .
+
+docker-push:
+	@echo "Pushing $(BUILD_NAME):$(tag)"
+	docker tag $(BUILD_NAME) $(BUILD_NAME):$(TAG)
+	docker push $(BUILD_NAME):$(TAG)
