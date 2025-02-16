@@ -58,18 +58,6 @@
 		filter: drop-shadow(0, 0, 1px, currentcolor);
 	}
 
-	button:after {
-		content: '';
-		position: absolute;
-		z-index: -1;
-		inset: 0;
-		opacity: 0.6;
-		border-radius: inherit;
-		box-shadow: 0 0 4px 2px var(--color-blue-300);
-		transition: 250ms ease-in-out;
-		transition-property: opacity;
-	}
-
 	.neon-text-blue {
 		color: #fff;
 		text-shadow:
