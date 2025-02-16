@@ -2,7 +2,7 @@
 	import { SiGithub } from '@icons-pack/svelte-simple-icons';
 </script>
 
-<div class="flex h-screen items-center">
+<div class="flex h-dvh items-center">
 	<div class="flex w-full flex-col items-center">
 		<div class="flex w-full max-w-[600px] flex-col items-center gap-6 px-4">
 			<div class="flex flex-col items-center">
