@@ -62,11 +62,11 @@ jobs:
 
           echo "Pushing images..."
           if [[ $BRANCH_NAME == "main" ]]; then
-            cd backend && make docker-push TAG=$COMMIT_ID
-            cd backend && make docker-push TAG=latest
+            make docker-push TAG=$COMMIT_ID
+            make docker-push TAG=latest
           else
-            cd backend && make docker-push TAG=$BRANCH_NAME-$COMMIT_ID
-            cd backend && make docker-push TAG=$BRANCH_NAME-latest
+            make docker-push TAG=$BRANCH_NAME-$COMMIT_ID
+            make docker-push TAG=$BRANCH_NAME-latest
           fi
       - name: Build Landing
         if: ${{ needs.changes.outputs.landing == 'true' }}
@@ -76,11 +76,11 @@ jobs:
 
           echo "Push images"
           if [[ $BRANCH_NAME == "main" ]]; then
-            cd landing && make docker-push TAG=$COMMIT_ID
-            cd landing && make docker-push TAG=latest
+            make docker-push TAG=$COMMIT_ID
+            make docker-push TAG=latest
           else
-            cd landing && make docker-push TAG=$BRANCH_NAME-$COMMIT_ID
-            cd landing && make docker-push TAG=$BRANCH_NAME-latest
+            make docker-push TAG=$BRANCH_NAME-$COMMIT_ID
+            make docker-push TAG=$BRANCH_NAME-latest
           fi
 
   deploy:
