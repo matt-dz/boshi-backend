@@ -105,9 +105,9 @@ jobs:
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
               export SUBDOMAIN="boshi"
-              export TAG="$main-COMMIT_ID";
+              export TAG="$COMMIT_ID";
             else
-              export NAMESPACE="$BRANCH_NAME";
+              export NAMESPACE="boshi-$BRANCH_NAME";
               export SUBDOMAIN="$BRANCH_NAME-boshi";
               export TAG="$BRANCH_NAME-$COMMIT_ID";
             fi
@@ -133,11 +133,11 @@ jobs:
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
               export SUBDOMAIN="boshi-app";
-              export TAG="latest";
+              export TAG="$COMMIT_ID";
             else
               export NAMESPACE="boshi-$BRANCH_NAME";
               export SUBDOMAIN="$BRANCH_NAME-boshi-app";
-              export TAG="$BRANCH_NAME-latest";
+              export TAG="$BRANCH_NAME-$COMMIT_ID";
             fi
 
             if kubectl get deployment boshi-landing -n $NAMESPACE $1 >/dev/null 2>&1; then
