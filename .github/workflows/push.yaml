@@ -78,7 +78,7 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build image
-        run: cd landing && make docker
+        run: cd landing && make build
       - name: Push image with commit sha
         run: cd landing && make docker-push TAG=$BRANCH_NAME-$(git rev-parse --short "$GITHUB_SHA")
       - name: Push image with latest tag
@@ -89,7 +89,7 @@ jobs:
             cd backend && make docker-push TAG=$BRANCH_NAME-latest
           fi
 
-  deploy-backend:
+  deploy:
     needs: [build-backend, convert-branch-name]
     name: Create Backend Deployment
     runs-on: ubuntu-latest
