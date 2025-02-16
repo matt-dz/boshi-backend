@@ -14,12 +14,9 @@
 	<meta name="description" content={description} />
 	<meta property="og:title" content="Boshi" />
 	<meta property="og:description" content={description} />
-	<meta
-		property="og:image"
-		content={`https://${import.meta.env.VITE_BASE_URL}.deguzman.cloud/og-image.png`}
-	/>
+	<meta property="og:image" content={`${import.meta.env.VITE_BASE_URL}/og-image.png`} />
 
-	<meta property="og:url" content={`https://${import.meta.env.VITE_BASE_URL}.deguzman.cloud`} />
+	<meta property="og:url" content={`${import.meta.env.VITE_BASE_URL}`} />
 	<meta property="og:type" content="website" />
 
 	<!-- Twitter Card -->

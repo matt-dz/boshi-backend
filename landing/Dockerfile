@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY . .
 ENV ADAPTER=node
-ENV VITE_BASE_URL=$SUBDOMAIN
+ENV VITE_BASE_URL="https://$SUBDOMAIN.deguzman.cloud"
 
 RUN npm ci
 RUN npm run build
