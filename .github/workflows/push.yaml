@@ -51,7 +51,7 @@ jobs:
     - name: Build image
       run: cd backend && make docker
     - name: Push image with commit sha
-      run: make docker-push TAG=$BRANCH_NAME-$(git rev-parse --short "$GITHUB_SHA")
+      run: cd backend && make docker-push TAG=$BRANCH_NAME-$(git rev-parse --short "$GITHUB_SHA")
     - name: Push image with latest tag
       run: >-
         if [[ $BRANCH_NAME == "main" ]]; then
