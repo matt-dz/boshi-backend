@@ -38,7 +38,7 @@ jobs:
         run: |
           output=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
           echo "name=$output" >> $GITHUB_OUTPUT
-          echo "commit-id=$(git rev-parse --short "$GITHUB_SHA") >> $GITHUB_OUTPUT"
+          git rev-parse --short HEAD | xargs -I {} echo "commit-id={}" >> $GITHUB_OUTPUT
 
   build:
     needs: [changes, get-build-info]
@@ -112,6 +112,10 @@ jobs:
               export TAG="$BRANCH_NAME-$COMMIT_ID";
             fi
 
+            echo "Namespace: $NAMESPACE"
+            echo "Subdomain: $SUBDOMAIN"
+            echo "Tag: $TAG"
+
             if kubectl get deployment boshi-backend -n $NAMESPACE >/dev/null 2>&1; then
               kubectl set image deployments boshi-backend=$REGISTRY/boshi-backend:$TAG --all -n $NAMESPACE
             else
@@ -140,11 +144,15 @@ jobs:
               export TAG="$BRANCH_NAME-$COMMIT_ID";
             fi
 
+            echo "Namespace: $NAMESPACE"
+            echo "Subdomain: $SUBDOMAIN"
+            echo "Tag: $TAG"
+
             if kubectl get deployment boshi-landing -n $NAMESPACE $1 >/dev/null 2>&1; then
               kubectl set image deployments boshi-landing=$REGISTRY/boshi-landing:$TAG --all -n $NAMESPACE
             else
-                kubectl create namespace $NAMESPACE
-                kubectl create deployment boshi-landing --image=$REGISTRY/boshi-landing:$TAG --port=3000 -n $NAMESPACE
-                kubectl expose deployment boshi-landing --name=boshi-landing-svc --port=80 --target-port=3000 --type=ClusterIP -n $NAMESPACE
-                kubectl create ingress landing-ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$SUBDOMAIN.deguzman.cloud/*=boshi-landing-svc:80,tls=boshi-landing-tls" -n $NAMESPACE
+              kubectl create namespace $NAMESPACE
+              kubectl create deployment boshi-landing --image=$REGISTRY/boshi-landing:$TAG --port=3000 -n $NAMESPACE
+              kubectl expose deployment boshi-landing --name=boshi-landing-svc --port=80 --target-port=3000 --type=ClusterIP -n $NAMESPACE
+              kubectl create ingress landing-ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$SUBDOMAIN.deguzman.cloud/*=boshi-landing-svc:80,tls=boshi-landing-tls" -n $NAMESPACE
             fi
