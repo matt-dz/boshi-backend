@@ -13,14 +13,16 @@
 					Under <span class="flicker sign">Construction</span>
 				</h1>
 			</div>
-			<div class="mt-16 flex flex-col items-center gap-4">
+			<div class="mt-16 flex w-full max-w-[550px] flex-col items-center gap-4">
 				<h1 class="text-center text-lg font-extralight text-gray-300 sm:text-xl">
 					Connect, share, and explore campus life — <span class="italic">anonymously</span>.
 				</h1>
 				<h1 class="text-center text-lg font-extralight text-gray-300 sm:text-xl">
 					Get notified when the <span class="italic">only</span>
 					university social media built on the
-					<span class="neon-text-blue">at protocol</span> is ready.
+					<a href="https://bsky.social/about/blog/10-18-2022-the-at-protocol" target="_blank"
+						><span class="neon-text-blue">at protocol</span></a
+					> is ready.
 				</h1>
 			</div>
 
