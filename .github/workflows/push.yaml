@@ -31,6 +31,7 @@ jobs:
       name: ${{ steps.convert.outputs.name }}
       commit-id: ${{ steps.convert.outputs.commit-id }}
     steps:
+      - uses: actions/checkout@v4
       - id: convert
         env:
           BRANCH_NAME: "${{ github.head_ref || github.ref_name }}"
