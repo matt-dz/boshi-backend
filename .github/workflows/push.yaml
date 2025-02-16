@@ -118,7 +118,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: BRANCH_NAME,REGISTRY,COMMMIT_ID
+          envs: BRANCH_NAME,REGISTRY,COMMIT_ID
           script: |
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
@@ -160,7 +160,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: BRANCH_NAME,REGISTRY,COMMMIT_ID
+          envs: BRANCH_NAME,REGISTRY,COMMIT_ID
           script: |
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
