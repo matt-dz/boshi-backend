@@ -113,7 +113,7 @@ jobs:
             fi
 
             if kubectl get namespace $NAMESPACE >/dev/null 2>&1; then
-              kubectl rollout restart deployment boshi-backend -n $NAMESPACE
+              kubectl set image deployments boshi-backend=$REGISTRY/boshi-backend:$TAG --all -n $NAMESPACE
             else
               kubectl create namespace $NAMESPACE
               kubectl create deployment boshi-backend --image=$REGISTRY/boshi-backend:$TAG --port=80 -n $NAMESPACE
@@ -141,7 +141,7 @@ jobs:
             fi
 
             if kubectl get deployment boshi-landing -n $NAMESPACE $1 >/dev/null 2>&1; then
-              kubectl rollout restart deployment boshi-landing -n $NAMESPACE
+              kubectl set image deployments boshi-landing=$REGISTRY/boshi-landing:$TAG --all -n $NAMESPACE
             else
                 kubectl create namespace $NAMESPACE
                 kubectl create deployment boshi-landing --image=$REGISTRY/boshi-landing:$TAG --port=3000 -n $NAMESPACE
