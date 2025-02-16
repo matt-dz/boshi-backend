@@ -40,9 +40,10 @@ jobs:
           echo "name=$output" >> $GITHUB_OUTPUT
           git rev-parse --short HEAD | xargs -I {} echo "commit-id={}" >> $GITHUB_OUTPUT
 
-  build:
+  build-backend:
     needs: [changes, get-build-info]
-    name: Build Images
+    name: Build Backend
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     env:
       BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
@@ -55,7 +56,6 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Backend
-        if: ${{ needs.changes.outputs.backend == 'true' }}
         run: |
           echo "Building backend..."
           cd backend && make docker
@@ -68,8 +68,23 @@ jobs:
             make docker-push TAG=$BRANCH_NAME-$COMMIT_ID
             make docker-push TAG=$BRANCH_NAME-latest
           fi
+
+  build-landing:
+    needs: [changes, get-build-info]
+    name: Build Landing
+    if: ${{ needs.changes.outputs.landing == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
+      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Landing
-        if: ${{ needs.changes.outputs.landing == 'true' }}
         run: |
           echo "Building Landing"
           cd landing && make docker
@@ -83,9 +98,9 @@ jobs:
             make docker-push TAG=$BRANCH_NAME-latest
           fi
 
-  deploy:
-    needs: [changes, build, get-build-info]
-    name: Deploy Images
+  deploy-backend:
+    needs: [changes, build-backend, get-build-info]
+    name: Deploy Backend
     runs-on: ubuntu-latest
     env:
       BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
@@ -124,6 +139,16 @@ jobs:
               kubectl expose deployment boshi-backend --name=boshi-backend-svc --port=80 --target-port=80 --type=ClusterIP -n $NAMESPACE
               kubectl create ingress ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$SUBDOMAIN.deguzman.cloud/api/*=boshi-backend-svc:80,tls=boshi-tls" --rule="$SUBDOMAIN.deguzman.cloud/oauth/*=boshi-backend-svc:80,tls=boshi-tls" -n $NAMESPACE
             fi
+
+  deploy-landing:
+    needs: [changes, build-landing, get-build-info]
+    name: Deploy Landing
+    runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
+      REGISTRY: ${{ vars.DOCKER_REGISTRY }}
+      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
+    steps:
       - name: Create/Update Landing Deployment
         if: ${{ needs.changes.outputs.landing == 'true' }}
         uses: appleboy/ssh-action@v1.2.0
