@@ -6,20 +6,22 @@ jobs:
     permissions:
       pull-requests: read
     outputs:
-      changes: ${{ steps.filter.outputs.src }}
+      changes: ${{ steps.filter.outputs.backend }}
     steps:
     - uses: actions/checkout@v4
     - uses: dorny/paths-filter@v3
       id: filter
       with:
         filters: |
-          src:
-            - 'go.mod'
-            - 'cmd/**'
-            - 'internal/**'
+          backend:
+            - 'backend/go.mod'
+            - 'backend/cmd/**'
+            - 'backend/internal/**'
+            - 'backend/.dockerignore'
+            - 'backend/Dockerfile'
+            - 'backend/scripts/**'
+            - 'backend/configs/**'
             - '.github/workflows/push.yaml'
-            - '.dockerignore'
-            - 'Dockerfile'
 
   convert-branch-name:
     runs-on: ubuntu-latest
@@ -34,7 +36,7 @@ jobs:
         run: |
           output=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
           echo "name=$output" >> $GITHUB_OUTPUT
-  build:
+  build-backend:
     runs-on: ubuntu-latest
     needs: convert-branch-name
     env:
@@ -47,18 +49,18 @@ jobs:
         username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Build image
-      run: make docker
+      run: cd backend && make docker
     - name: Push image with commit sha
       run: make docker-push TAG=$BRANCH_NAME-$(git rev-parse --short "$GITHUB_SHA")
     - name: Push image with latest tag
       run: >-
         if [[ $BRANCH_NAME == "main" ]]; then
-          make docker-push TAG=latest
+          cd backend && make docker-push TAG=latest
         else
-          make docker-push TAG=$BRANCH_NAME-latest
+          cd backend && make docker-push TAG=$BRANCH_NAME-latest
         fi
   deploy:
-    needs: [build, convert-branch-name]
+    needs: [build-backend, convert-branch-name]
     name: Create Deployment
     runs-on: ubuntu-latest
     env:
