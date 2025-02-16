@@ -17,13 +17,13 @@ func main() {
 	/* Setup routes */
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/heartbeat",
+	mux.HandleFunc("/api/heartbeat",
 		middleware.Chain(
 			endpoints.Heartbeat,
 			middleware.LogRequest(),
 		))
 
-	mux.HandleFunc("/client-metadata.json",
+	mux.HandleFunc("/oauth/client-metadata.json",
 		middleware.Chain(
 			endpoints.ServeOauthMetadata,
 			middleware.LogRequest(),
