@@ -26,7 +26,7 @@ docker-push:
 docker:
 	@echo "Building $(BUILD_NAME)..."
 	subdomain=$$(../scripts/generate-subdomain.sh) && \
-	   if [[ subdomain == "main" ]]; then subdomain="boshi"; fi && \
+	   if [ subdomain == "main" ]; then subdomain="boshi"; fi && \
 		docker buildx build --build-arg SUBDOMAIN=$${subdomain} --platform $(PLATFORM) -t $(BUILD_NAME) .
 
 clean:
