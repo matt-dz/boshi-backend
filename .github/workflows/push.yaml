@@ -22,13 +22,14 @@ jobs:
               - 'backend/**'
               - '!backend/env.example'
 
-  convert-branch-name:
+  get-build-info:
     needs: changes
-    name: Convert Branch Name
+    name: Get Build Info
     runs-on: ubuntu-latest
-    if: ${{ needs.changes.outputs.backend == 'true' }}
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.landing == 'true' }}
     outputs:
       name: ${{ steps.convert.outputs.name }}
+      commit-id: ${{ steps.convert.outputs.commit-id }}
     steps:
       - id: convert
         env:
@@ -36,14 +37,15 @@ jobs:
         run: |
           output=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed -E 's/^-+|-+$//g')
           echo "name=$output" >> $GITHUB_OUTPUT
+          echo "commit-id=$(git rev-parse --short "$GITHUB_SHA") >> $GITHUB_OUTPUT"
 
-  build-backend:
-    needs: convert-branch-name
-    name: Build Backend
+  build:
+    needs: get-build-info
+    name: Build Images
     runs-on: ubuntu-latest
-    if: ${{ needs.changes.outputs.backend == 'true' }}
     env:
-      BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
+      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
+      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
     steps:
       - uses: actions/checkout@v4
       - name: Login to Docker Hub
@@ -51,52 +53,43 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build image
-        run: cd backend && make docker
-      - name: Push image with commit sha
-        run: cd backend && make docker-push TAG=$BRANCH_NAME-$(git rev-parse --short "$GITHUB_SHA")
-      - name: Push image with latest tag
-        run: >-
+      - name: Build Backend
+        if: ${{ needs.changes.outputs.backend == 'true' }}
+        run: |
+          echo "Building backend..."
+          cd backend && make docker
+
+          echo "Pushing images..."
           if [[ $BRANCH_NAME == "main" ]]; then
+            cd backend && make docker-push TAG=$COMMIT_ID
             cd backend && make docker-push TAG=latest
           else
+            cd backend && make docker-push TAG=$BRANCH_NAME-$COMMIT_ID
             cd backend && make docker-push TAG=$BRANCH_NAME-latest
           fi
+      - name: Build Landing
+        if: ${{ needs.changes.outputs.landing == 'true' }}
+        run: |
+          echo "Building Landing"
+          cd landing && make docker
 
-  build-landing:
-    needs: convert-branch-name
-    name: Build Landing
-    runs-on: ubuntu-latest
-    if: ${{ needs.changes.outputs.landing == 'true' }}
-    env:
-      BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build image
-        run: cd landing && make build
-      - name: Push image with commit sha
-        run: cd landing && make docker-push TAG=$BRANCH_NAME-$(git rev-parse --short "$GITHUB_SHA")
-      - name: Push image with latest tag
-        run: >-
+          echo "Push images"
           if [[ $BRANCH_NAME == "main" ]]; then
+            cd landing && make docker-push TAG=$COMMIT_ID
             cd landing && make docker-push TAG=latest
           else
+            cd landing && make docker-push TAG=$BRANCH_NAME-$COMMIT_ID
             cd landing && make docker-push TAG=$BRANCH_NAME-latest
           fi
 
-  deploy-backend:
-    needs: [build-backend, convert-branch-name]
-    name: Create Backend Deployment
-    if: ${{ needs.changes.outputs.backend == 'true' }}
+  deploy:
+    needs: [build, get-build-info]
+    name: Deploy Images
     runs-on: ubuntu-latest
     env:
-      BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
+      BRANCH_NAME: ${{needs.get-build-info.outputs.name}}
       REGISTRY: ${{ vars.DOCKER_REGISTRY }}
+      COMMIT_ID: ${{needs.get-build-info.outputs.commit-id}}
     steps:
       - name: Create/Update Backend Deployment
         if: ${{ needs.changes.outputs.backend == 'true' }}
@@ -111,11 +104,11 @@ jobs:
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
               export SUBDOMAIN="boshi"
-              export TAG="latest";
+              export TAG="$main-COMMIT_ID";
             else
               export NAMESPACE="$BRANCH_NAME";
               export SUBDOMAIN="$BRANCH_NAME-boshi";
-              export TAG="$BRANCH_NAME-latest";
+              export TAG="$BRANCH_NAME-$COMMIT_ID";
             fi
 
             if kubectl get namespace $NAMESPACE >/dev/null 2>&1; then
@@ -126,17 +119,9 @@ jobs:
               kubectl expose deployment boshi-backend --name=boshi-backend-svc --port=80 --target-port=80 --type=ClusterIP -n $NAMESPACE
               kubectl create ingress ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$SUBDOMAIN.deguzman.cloud/api/*=boshi-backend-svc:80,tls=boshi-tls" --rule="$SUBDOMAIN.deguzman.cloud/oauth/*=boshi-backend-svc:80,tls=boshi-tls" -n $NAMESPACE
             fi
-
-  deploy-landing:
-    needs: [build-landing, convert-branch-name]
-    name: Create/Update Landing Deployment
-    if: ${{ needs.changes.outputs.landing == 'true' }}
-    runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
-      REGISTRY: ${{ vars.DOCKER_REGISTRY }}
-    steps:
-      - uses: appleboy/ssh-action@v1.2.0
+      - name: Create/Update Landing Deployment
+        if: ${{ needs.changes.outputs.landing == 'true' }}
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
