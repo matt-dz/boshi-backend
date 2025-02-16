@@ -89,9 +89,10 @@ jobs:
             cd landing && make docker-push TAG=$BRANCH_NAME-latest
           fi
 
-  deploy:
+  deploy-backend:
     needs: [build-backend, convert-branch-name]
     name: Create Backend Deployment
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     env:
       BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
@@ -121,9 +122,17 @@ jobs:
               kubectl expose deployment boshi-backend --name=boshi-backend-svc --port=80 --target-port=80 --type=ClusterIP -n $NAMESPACE
               kubectl create ingress ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$BRANCH_NAME-boshi.deguzman.cloud/api/*=boshi-backend-svc:80,tls=boshi-tls" --rule="$BRANCH_NAME-boshi.deguzman.cloud/oauth/*=boshi-backend-svc:80,tls=boshi-tls" -n $NAMESPACE
             fi
-      - name: Create/Update Landing Deployment
-        if: ${{ needs.changes.outputs.landing == 'true' }}
-        uses: appleboy/ssh-action@v1.2.0
+
+  deploy-landing:
+    needs: [build-landing, convert-branch-name]
+    name: Create/Update Landing Deployment
+    if: ${{ needs.changes.outputs.landing == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{needs.convert-branch-name.outputs.name}}
+      REGISTRY: ${{ vars.DOCKER_REGISTRY }}
+    steps:
+      - uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -137,7 +146,7 @@ jobs:
               export NAMESPACE="boshi-$BRANCH_NAME";
             fi
 
-            if kubectl get deployment boshi-backend -n $NAMESPACE $1 >/dev/null 2>&1; then
+            if kubectl get deployment boshi-landing -n $NAMESPACE $1 >/dev/null 2>&1; then
               kubectl rollout restart deployment boshi-landing -n $NAMESPACE
             else
               kubectl create namespace $NAMESPACE
