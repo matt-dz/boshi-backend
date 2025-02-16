@@ -38,6 +38,6 @@ func main() {
 	server := &http.Server{Addr: fmt.Sprintf(":%s", port), Handler: mux}
 	bLogger.Info("Listening on port " + port + "...")
 	if err := server.ListenAndServe(); err != nil {
-		bLogger.Error("Server failed to start", "error", err)
+		bLogger.Error("Server failed to start ", "error", err)
 	}
 }
