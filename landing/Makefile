@@ -8,7 +8,7 @@ PLATFORM ?= linux/arm64
 
 all: build
 
-build:
+docker:
 	@echo "Building $(BUILD_NAME)"
 	docker buildx build --platform $(PLATFORM) -t $(BUILD_NAME) .
 
