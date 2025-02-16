@@ -1,6 +1,6 @@
-# Boshi Backend
+# Boshi
 
-Backend of the Boshi application.
+The source code for the Boshi application.
 
 ## Tech Stack
 
