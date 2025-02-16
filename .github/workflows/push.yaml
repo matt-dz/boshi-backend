@@ -41,7 +41,7 @@ jobs:
           echo "commit-id=$(git rev-parse --short "$GITHUB_SHA") >> $GITHUB_OUTPUT"
 
   build:
-    needs: get-build-info
+    needs: [changes, get-build-info]
     name: Build Images
     runs-on: ubuntu-latest
     env:
@@ -84,7 +84,7 @@ jobs:
           fi
 
   deploy:
-    needs: [build, get-build-info]
+    needs: [changes, build, get-build-info]
     name: Deploy Images
     runs-on: ubuntu-latest
     env:
