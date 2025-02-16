@@ -110,8 +110,10 @@ jobs:
           script: |
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
+              export SUBDOMAIN="boshi"
             else
-              export NAMESPACE="boshi-$BRANCH_NAME";
+              export NAMESPACE="$BRANCH_NAME";
+              export SUBDOMAIN="$BRANCH_NAME-boshi";
             fi
 
             if kubectl get namespace $NAMESPACE >/dev/null 2>&1; then
@@ -120,7 +122,7 @@ jobs:
               kubectl create namespace $NAMESPACE
               kubectl create deployment boshi-backend --image=$REGISTRY/boshi-backend:$BRANCH_NAME-latest --port=80 -n $NAMESPACE
               kubectl expose deployment boshi-backend --name=boshi-backend-svc --port=80 --target-port=80 --type=ClusterIP -n $NAMESPACE
-              kubectl create ingress ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$BRANCH_NAME-boshi.deguzman.cloud/api/*=boshi-backend-svc:80,tls=boshi-tls" --rule="$BRANCH_NAME-boshi.deguzman.cloud/oauth/*=boshi-backend-svc:80,tls=boshi-tls" -n $NAMESPACE
+              kubectl create ingress ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$SUBDOMAIN.deguzman.cloud/api/*=boshi-backend-svc:80,tls=boshi-tls" --rule="$SUBDOMAIN.deguzman.cloud/oauth/*=boshi-backend-svc:80,tls=boshi-tls" -n $NAMESPACE
             fi
 
   deploy-landing:
@@ -142,15 +144,17 @@ jobs:
           script: |
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
+              export SUBDOMAIN="boshi-app";
             else
               export NAMESPACE="boshi-$BRANCH_NAME";
+              export SUBDOMAIN="$BRANCH_NAME-boshi-app";
             fi
 
             if kubectl get deployment boshi-landing -n $NAMESPACE $1 >/dev/null 2>&1; then
               kubectl rollout restart deployment boshi-landing -n $NAMESPACE
             else
-              kubectl create namespace $NAMESPACE
-              kubectl create deployment boshi-landing --image=$REGISTRY/boshi-landing:$BRANCH_NAME-latest --port=3000 -n $NAMESPACE
-              kubectl expose deployment boshi-landing --name=boshi-landing-svc --port=80 --target-port=3000 --type=ClusterIP -n $NAMESPACE
-              kubectl create ingress landing-ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$BRANCH_NAME-boshi-app.deguzman.cloud/*=boshi-landing-svc:80,tls=boshi-landing-tls" -n $NAMESPACE
+                kubectl create namespace $NAMESPACE
+                kubectl create deployment boshi-landing --image=$REGISTRY/boshi-landing:$BRANCH_NAME-latest --port=3000 -n $NAMESPACE
+                kubectl expose deployment boshi-landing --name=boshi-landing-svc --port=80 --target-port=3000 --type=ClusterIP -n $NAMESPACE
+                kubectl create ingress landing-ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$SUBDOMAIN.deguzman.cloud/*=boshi-landing-svc:80,tls=boshi-landing-tls" -n $NAMESPACE
             fi

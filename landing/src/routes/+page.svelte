@@ -4,39 +4,46 @@
 
 <div class="flex h-screen items-center">
 	<div class="flex w-full flex-col items-center">
-		<div class="flex w-[600px] flex-col items-center">
-			<h1 class="sign neon-text-blue text-8xl font-medium tracking-widest">Boshi</h1>
-			<h1 class="sign neon-text-blue mt-16 text-4xl font-medium tracking-widest">
-				Under <span class="flicker sign">Construction</span>
-			</h1>
+		<div class="flex w-full max-w-[600px] flex-col items-center gap-6 px-4">
+			<div class="flex flex-col items-center">
+				<h1 class="sign neon-text-blue text-5xl font-medium tracking-widest sm:text-8xl">Boshi</h1>
+				<h1
+					class="sign neon-text-blue mt-16 text-center text-2xl font-medium tracking-widest sm:text-4xl"
+				>
+					Under <span class="flicker sign">Construction</span>
+				</h1>
+			</div>
 			<div class="mt-16 flex flex-col items-center gap-4">
-				<h1 class="text-center text-xl font-extralight text-gray-300">
+				<h1 class="text-center text-lg font-extralight text-gray-300 sm:text-xl">
 					Connect, share, and explore campus life — anonymously.
 				</h1>
-				<h1 class="text-center text-xl font-extralight text-gray-300">
+				<h1 class="text-center text-lg font-extralight text-gray-300 sm:text-xl">
 					Get notified when the <span class="italic">only</span>
 					university social media built on the
 					<span class="neon-text-blue">at protocol</span> is ready.
 				</h1>
-				<div class="mt-2 flex">
+			</div>
+
+			<div class="flex w-full flex-col items-center gap-1">
+				<div class="my-2 flex w-full max-w-[500px]">
 					<input
 						type="text"
-						class="w-[350px] grow rounded-lg border-2 border-solid border-gray-700 bg-black px-2.5 py-2 text-gray-300 focus:outline-2 focus:outline-blue-700"
+						class="grow rounded-lg border-2 border-solid border-gray-700 bg-black px-2.5 py-2 text-gray-300 focus:outline-2 focus:outline-blue-700"
 						placeholder="Enter email..."
 					/>
 					<button
 						class="transition-duration-200 ml-3 cursor-pointer rounded-lg border-2 border-solid border-blue-300 bg-black px-4 py-2 text-violet-300 drop-shadow-[0_0_6px_var(--color-blue-300)] transition-colors hover:bg-blue-950"
 					>
-						<span class="btn-text text-blue-300">Notify Me</span>
+						<span class="btn-text text-sm text-blue-300 sm:text-base">Notify Me</span>
 					</button>
 				</div>
-				<h1 class="font-extralight text-gray-300">Unsubscribe at any time.</h1>
+				<h1 class="text-sm font-extralight text-gray-300 sm:text-base">Unsubscribe at any time.</h1>
+			</div>
 
-				<div class="mt-6">
-					<a href="https://github.com/matt-dz/boshi" target="_blank">
-						<SiGithub color="white" />
-					</a>
-				</div>
+			<div class="mt-6">
+				<a href="https://github.com/matt-dz/boshi" target="_blank">
+					<SiGithub color="white" />
+				</a>
 			</div>
 		</div>
 	</div>
