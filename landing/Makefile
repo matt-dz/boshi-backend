@@ -10,7 +10,9 @@ all: build
 
 docker:
 	@echo "Building $(BUILD_NAME)"
-	docker buildx build --platform $(PLATFORM) -t $(BUILD_NAME) .
+	subdomain=$$(../scripts/generate-subdomain.sh)-boshi-app && \
+        if [[ subdomain == "main" ]]; then subdomain="boshi-app"; fi && \
+	   docker buildx build --build-arg SUBDOMAIN=$${subdomain} --platform $(PLATFORM) -t $(BUILD_NAME) .
 
 docker-push:
 	@echo "Pushing $(BUILD_NAME):$(tag)"
