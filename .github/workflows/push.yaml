@@ -92,5 +92,5 @@ jobs:
               kubectl create namespace $NAMESPACE
               kubectl create deployment boshi-backend --image=$REGISTRY/boshi-backend:$BRANCH_NAME-latest --port=80 -n $NAMESPACE
               kubectl expose deployment boshi-backend --name=boshi-backend-svc --port=80 --target-port=80 --type=ClusterIP -n $NAMESPACE
-              kubectl create ingress ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$BRANCH_NAME-boshi.deguzman.cloud/api/*=boshi-backend-svc:80,$BRANCH_NAME-boshi.deguzman.cloud/oauth/*=boshi-backend-svc:80,tls=boshi-tls" -n $NAMESPACE
+              kubectl create ingress ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$BRANCH_NAME-boshi.deguzman.cloud/api/*=boshi-backend-svc:80,tls=boshi-tls" --rule="$BRANCH_NAME-boshi.deguzman.cloud/oauth/*=boshi-backend-svc:80,tls=boshi-tls" -n $NAMESPACE
             fi
