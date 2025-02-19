@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/src/view/login/login.dart';
+
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:frontend/src/view/login/redirect.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
+import 'package:frontend/src/view/login/login.dart';
+
 void main() {
+  usePathUrlStrategy();
   runApp(const MyApp());
 }
 
@@ -12,15 +18,30 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ShadApp.material(
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => MyHomePage(title: "hello"),
+        ),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => LoginPage(),
+          routes: [
+            GoRoute(
+              path: '/redirect',
+              builder: (context, state) => RedirectPage(),
+            ),
+          ],
+        ),
+      ],
+    );
+
+    return ShadApp.materialRouter(
       materialThemeBuilder: (context, theme) {
         return theme.copyWith();
       },
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const MyHomePage(title: "hi"),
-        '/login': (context) => const LoginPage(),
-      },
+      routerConfig: router,
     );
   }
 }

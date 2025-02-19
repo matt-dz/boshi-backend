@@ -14,7 +14,7 @@ class OAuthRepository {
 
   final OAuthService _oAuthService = OAuthService();
 
-  Future<OAuthClient> getOAuthClient() async {
+  Future<OAuthClient> GetOAuthClient() async {
     _oAuthClientMetadata = await _oAuthService.getClientMetadata(_clientId);
 
     _oAuthClient = OAuthClient(_oAuthClientMetadata);
@@ -22,9 +22,9 @@ class OAuthRepository {
     return _oAuthClient;
   }
 
-  Future<Uri> getAuthorizationURI(String identity) async {
+  Future<Uri> GetAuthorizationURI(String identity) async {
     try {
-      await getOAuthClient();
+      await GetOAuthClient();
 
       final (uri, context) = await _oAuthService.getOAuthAuthorizationURI(
         _oAuthClient,
@@ -40,9 +40,9 @@ class OAuthRepository {
     }
   }
 
-  Future<atp.ATProto> getSession(String callback) async {
+  Future<atp.ATProto> GetSession(String callback) async {
     try {
-      await getOAuthClient();
+      await GetOAuthClient();
 
       final (oAuthSession, atProto) = await OAuthService().getOAuthSession(
         _oAuthClient,
