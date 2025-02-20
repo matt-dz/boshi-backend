@@ -1,4 +1,4 @@
-.PHONY: all build docker-push
+.PHONY: docker docker-push
 
 SHELL := /bin/bash
 
@@ -7,8 +7,6 @@ IMAGE_NAME ?= boshi-frontend
 TAG ?= latest
 BUILD_NAME ?= $(DOCKER_REGISTRY)/$(IMAGE_NAME)
 PLATFORM ?= linux/arm64
-
-all: build
 
 docker:
 	@echo "Building $(BUILD_NAME)"
