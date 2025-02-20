@@ -4,4 +4,5 @@ COPY . .
 RUN flutter build web
 
 FROM nginx:alpine
+EXPOSE 80
 COPY --from=build /app/build/web /usr/share/nginx/html

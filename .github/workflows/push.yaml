@@ -256,7 +256,7 @@ jobs:
               kubectl set image deployments boshi-frontend boshi-frontend=$REGISTRY/boshi-frontend:$TAG -n $NAMESPACE
             else
               kubectl create namespace $NAMESPACE
-              kubectl create deployment boshi-frontend --image=$REGISTRY/boshi-frontend:$TAG --port=8080 -n $NAMESPACE
-              kubectl expose deployment boshi-frontend --name=boshi-frontend-svc --port=80 --target-port=8080 --type=ClusterIP -n $NAMESPACE
+              kubectl create deployment boshi-frontend --image=$REGISTRY/boshi-frontend:$TAG --port=80 -n $NAMESPACE
+              kubectl expose deployment boshi-frontend --name=boshi-frontend-svc --port=80 --target-port=80 --type=ClusterIP -n $NAMESPACE
               kubectl create ingress frontend-ingress --annotation cert-manager.io/cluster-issuer="letsencrypt-prod" --class=nginx --rule="$SUBDOMAIN.deguzman.cloud/*=boshi-frontend-svc:80,tls=boshi-frontend-tls" -n $NAMESPACE
             fi
