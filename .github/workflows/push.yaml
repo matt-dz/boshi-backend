@@ -240,11 +240,11 @@ jobs:
           script: |
             if [[ $BRANCH_NAME == "main" ]]; then
               export NAMESPACE="boshi";
-              export SUBDOMAIN="boshi-app";
+              export SUBDOMAIN="boshi";
               export TAG="$COMMIT_ID";
             else
               export NAMESPACE="boshi-$BRANCH_NAME";
-              export SUBDOMAIN="$BRANCH_NAME-boshi-app";
+              export SUBDOMAIN="$BRANCH_NAME-boshi";
               export TAG="$BRANCH_NAME-$COMMIT_ID";
             fi
 
