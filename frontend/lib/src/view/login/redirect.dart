@@ -21,8 +21,7 @@ class _RedirectPageState extends State<RedirectPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         OAuthRepository oAuthAgent = OAuthRepository(
-          clientId:
-              "https://feat-login-page-boshi.deguzman.cloud/oauth/client-metadata.json",
+          clientId: "${Uri.base.origin}/oauth/client-metadata.json",
         );
         atp.ATProto atProto = await oAuthAgent.GetSession(Uri.base.toString());
 

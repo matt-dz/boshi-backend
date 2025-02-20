@@ -15,8 +15,7 @@ class LoginPage extends StatelessWidget {
       floatingActionButton: FilledButton(
         onPressed: () async {
           OAuthRepository oAuthAgent = OAuthRepository(
-            clientId:
-                "https://feat-login-page-boshi.deguzman.cloud/oauth/client-metadata.json",
+            clientId: "${Uri.base.origin}/oauth/client-metadata.json",
           );
           Uri authUri = await oAuthAgent.GetAuthorizationURI("");
           if (!await launchUrl(authUri)) {
