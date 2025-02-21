@@ -25,7 +25,6 @@ class OAuthService {
 
   Future<(Uri, OAuthContext)> getOAuthAuthorizationURI(
     OAuthClient client,
-    String clientId,
     String identity,
   ) async {
     try {

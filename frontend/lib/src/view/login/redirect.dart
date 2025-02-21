@@ -1,14 +1,13 @@
-import 'package:atproto/core.dart';
 import 'package:flutter/material.dart';
 
 import 'package:atproto/atproto.dart' as atp;
 import 'package:atproto/atproto_oauth.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:frontend/src/model/oauth/oauth_repository.dart';
-
 class RedirectPage extends StatefulWidget {
-  const RedirectPage({super.key});
+  const RedirectPage({super.key, required this.atpSession});
+
+  final atp.ATProto? atpSession;
 
   @override
   State<RedirectPage> createState() => _RedirectPageState();
@@ -16,24 +15,17 @@ class RedirectPage extends StatefulWidget {
 
 class _RedirectPageState extends State<RedirectPage> {
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        OAuthRepository oAuthAgent = OAuthRepository(
-          clientId: "${Uri.base.origin}/oauth/client-metadata.json",
-        );
-        atp.ATProto atProto = await oAuthAgent.GetSession(Uri.base.toString());
-
-        context.go("/");
+        if (widget.atpSession != null) context.go("/");
       } on OAuthException {
         rethrow;
       }
     });
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
+    return Center(
+      child: const Text("Redirecting..."),
+    );
   }
 }

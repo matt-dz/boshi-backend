@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:frontend/src/model/oauth/oauth_repository.dart';
 import 'package:frontend/src/view/login/redirect.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import 'package:frontend/src/view/login/login.dart';
 
 void main() {
   usePathUrlStrategy();
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+          create: (context) => OAuthRepository(
+              clientId: Uri.base.isScheme("http")
+                  ? Uri.base
+                  : Uri.parse("${Uri.base.origin}/oauth/client-metadata.json")))
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -30,7 +41,13 @@ class MyApp extends StatelessWidget {
           routes: [
             GoRoute(
               path: '/redirect',
-              builder: (context, state) => RedirectPage(),
+              builder: (context, state) =>
+                  Consumer<OAuthRepository>(builder: (context, oauth, child) {
+                if (oauth.atProtoSession == null) {
+                  oauth.getSession(Uri.base.toString());
+                }
+                return RedirectPage(atpSession: oauth.atProtoSession);
+              }),
             ),
           ],
         ),
@@ -56,14 +73,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,19 +86,16 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+          children: [
+            Consumer<OAuthRepository>(builder: (context, oauth, child) {
+              if (oauth.atProtoSession != null) {
+                return Text("Your session: ${oauth.atProtoSession?.identity}");
+              } else {
+                return Text("Please sign in.");
+              }
+            }),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
