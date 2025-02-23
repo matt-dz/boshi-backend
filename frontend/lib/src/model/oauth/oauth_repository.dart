@@ -87,8 +87,13 @@ class OAuthRepository extends ChangeNotifier {
     try {
       await getOAuthClient();
 
-      final session = await OAuthService().refreshWithoutSession();
-      print(session);
+      final session = await OAuthService().getStoredOAuthSession();
+      _oAuthSession = session;
+      final newSession = await _oAuthClient.refresh(session);
+      await _oAuthService.setSessionVars(newSession);
+      _atProto = atp.ATProto.fromOAuthSession(newSession);
+
+      notifyListeners();
     } on ArgumentError {
       rethrow;
     }
