@@ -82,4 +82,15 @@ class OAuthRepository extends ChangeNotifier {
       rethrow;
     }
   }
+
+  Future<void> refreshSession() async {
+    try {
+      await getOAuthClient();
+
+      final session = await OAuthService().refreshWithoutSession();
+      print(session);
+    } on ArgumentError {
+      rethrow;
+    }
+  }
 }

@@ -91,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
               if (oauth.atProtoSession != null) {
                 return Text("Your session: ${oauth.atProtoSession?.identity}");
               } else {
+                oauth.refreshSession();
                 return Text("Please sign in.");
               }
             }),

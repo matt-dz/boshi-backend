@@ -63,6 +63,10 @@ class OAuthService {
         );
 
         final session = await client.callback(Uri.base.toString(), context);
+
+        await prefs.setString("refresh", session.refreshToken);
+        await prefs.setString("access", session.accessToken);
+
         final atProtoSession = atp.ATProto.fromOAuthSession(session);
         return (session, atProtoSession);
       } else {
@@ -73,5 +77,12 @@ class OAuthService {
     } on ArgumentError {
       rethrow;
     }
+  }
+
+  Future<Session> refreshWithoutSession() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final refreshJwt = prefs.getString('refresh');
+    if (refreshJwt == null) throw ArgumentError("No refresh token");
+    return (await atp.refreshSession(refreshJwt: refreshJwt)).data;
   }
 }
