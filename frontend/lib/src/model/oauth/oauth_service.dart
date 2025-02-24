@@ -25,7 +25,6 @@ class OAuthService {
 
   Future<(Uri, OAuthContext)> getOAuthAuthorizationURI(
     OAuthClient client,
-    String clientId,
     String identity,
   ) async {
     try {
@@ -64,6 +63,9 @@ class OAuthService {
         );
 
         final session = await client.callback(Uri.base.toString(), context);
+
+        await setSessionVars(session);
+
         final atProtoSession = atp.ATProto.fromOAuthSession(session);
         return (session, atProtoSession);
       } else {
@@ -72,6 +74,46 @@ class OAuthService {
     } on OAuthException {
       rethrow;
     } on ArgumentError {
+      rethrow;
+    }
+  }
+
+  Future<OAuthSession> getStoredOAuthSession() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final sessionVars = prefs.getString('session-vars');
+      if (sessionVars != null) {
+        final sessionMap = json.decode(sessionVars);
+        return OAuthSession(
+            accessToken: sessionMap['accessToken'],
+            refreshToken: sessionMap['refreshToken'],
+            tokenType: sessionMap['tokenType'],
+            scope: sessionMap['scope'],
+            expiresAt: DateTime.parse(sessionMap['expiresAt']),
+            sub: sessionMap['sub'],
+            $dPoPNonce: sessionMap['\$dPoPNonce'],
+            $publicKey: sessionMap['\$publicKey'],
+            $privateKey: sessionMap['\$privateKey']);
+      } else {
+        throw ArgumentError("No session stored");
+      }
+    } on ArgumentError {
+      rethrow;
+    }
+  }
+
+  Future<void> setSessionVars(OAuthSession session) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          "session-vars",
+          json.encode(
+            session,
+            toEncodable: (object) {
+              return object.toString();
+            },
+          ));
+    } catch (e) {
       rethrow;
     }
   }
