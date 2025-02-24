@@ -79,22 +79,26 @@ class OAuthService {
   }
 
   Future<OAuthSession> getStoredOAuthSession() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final sessionVars = prefs.getString('session-vars');
-    if (sessionVars != null) {
-      final sessionMap = json.decode(sessionVars);
-      return OAuthSession(
-          accessToken: sessionMap['accessToken'],
-          refreshToken: sessionMap['refreshToken'],
-          tokenType: sessionMap['tokenType'],
-          scope: sessionMap['scope'],
-          expiresAt: DateTime.parse(sessionMap['expiresAt']),
-          sub: sessionMap['sub'],
-          $dPoPNonce: sessionMap['\$dPoPNonce'],
-          $publicKey: sessionMap['\$publicKey'],
-          $privateKey: sessionMap['\$privateKey']);
-    } else {
-      throw ArgumentError("No session stored");
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final sessionVars = prefs.getString('session-vars');
+      if (sessionVars != null) {
+        final sessionMap = json.decode(sessionVars);
+        return OAuthSession(
+            accessToken: sessionMap['accessToken'],
+            refreshToken: sessionMap['refreshToken'],
+            tokenType: sessionMap['tokenType'],
+            scope: sessionMap['scope'],
+            expiresAt: DateTime.parse(sessionMap['expiresAt']),
+            sub: sessionMap['sub'],
+            $dPoPNonce: sessionMap['\$dPoPNonce'],
+            $publicKey: sessionMap['\$publicKey'],
+            $privateKey: sessionMap['\$privateKey']);
+      } else {
+        throw ArgumentError("No session stored");
+      }
+    } on ArgumentError {
+      rethrow;
     }
   }
 
