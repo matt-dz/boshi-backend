@@ -7,9 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:frontend/src/model/oauth/oauth_service.dart';
 
 class OAuthRepository extends ChangeNotifier {
-  OAuthRepository({required Uri clientId}) : _clientId = clientId;
+  OAuthRepository({required Uri clientId, this.service = "bsky.social"})
+      : _clientId = clientId;
 
   final Uri _clientId;
+
+  String service;
   late OAuthClientMetadata _oAuthClientMetadata;
   late OAuthClient _oAuthClient;
   late OAuthContext _oAuthContext;
@@ -41,7 +44,7 @@ class OAuthRepository extends ChangeNotifier {
           await _oAuthService.getClientMetadata(_clientId.toString());
     }
 
-    _oAuthClient = OAuthClient(_oAuthClientMetadata);
+    _oAuthClient = OAuthClient(_oAuthClientMetadata, service: service);
   }
 
   Future<Uri> getAuthorizationURI(String identity) async {
