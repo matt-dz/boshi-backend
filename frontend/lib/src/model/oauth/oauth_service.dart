@@ -103,17 +103,12 @@ class OAuthService {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString(
           "session-vars",
-          json.encode({
-            'accessToken': session.accessToken,
-            'refreshToken': session.refreshToken,
-            'tokenType': session.tokenType,
-            'scope': session.scope,
-            'expiresAt': session.expiresAt.toString(),
-            'sub': session.sub,
-            '\$dPoPNonce': session.$dPoPNonce,
-            '\$publicKey': session.$publicKey,
-            '\$privateKey': session.$privateKey,
-          }));
+          json.encode(
+            session,
+            toEncodable: (object) {
+              return object.toString();
+            },
+          ));
     } catch (e) {
       rethrow;
     }

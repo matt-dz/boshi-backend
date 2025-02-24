@@ -23,7 +23,7 @@ class OAuthRepository extends ChangeNotifier {
 
   final OAuthService _oAuthService = OAuthService();
 
-  Future<void> getOAuthClient() async {
+  Future<void> generateOAuthClient() async {
     if (_clientId.isScheme('http')) {
       _oAuthClientMetadata = OAuthClientMetadata.fromJson({
         "client_id": "${_clientId.scheme}://${_clientId.host}",
@@ -47,7 +47,7 @@ class OAuthRepository extends ChangeNotifier {
 
   Future<Uri> getAuthorizationURI(String identity) async {
     try {
-      await getOAuthClient();
+      await generateOAuthClient();
 
       final (uri, context) = await _oAuthService.getOAuthAuthorizationURI(
         _oAuthClient,
@@ -64,9 +64,9 @@ class OAuthRepository extends ChangeNotifier {
     }
   }
 
-  Future<void> getSession(String callback) async {
+  Future<void> generateSession(String callback) async {
     try {
-      await getOAuthClient();
+      await generateOAuthClient();
 
       final (oAuthSession, atProto) = await OAuthService().getOAuthSession(
         _oAuthClient,
@@ -86,7 +86,7 @@ class OAuthRepository extends ChangeNotifier {
 
   Future<void> refreshSession() async {
     try {
-      await getOAuthClient();
+      await generateOAuthClient();
 
       final session = await OAuthService().getStoredOAuthSession();
       _oAuthSession = session;

@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
               builder: (context, state) =>
                   Consumer<OAuthRepository>(builder: (context, oauth, child) {
                 if (oauth.atProtoSession == null) {
-                  oauth.getSession(Uri.base.toString());
+                  oauth.generateSession(Uri.base.toString());
                 }
                 return RedirectPage(atpSession: oauth.atProtoSession);
               }),
