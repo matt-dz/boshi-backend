@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:atproto/atproto_oauth.dart';
 import 'package:atproto/atproto.dart' as atp;
 import 'package:flutter/material.dart';

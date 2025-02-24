@@ -51,6 +51,7 @@ class _LoginPageState extends State<LoginPage> {
                                 if (v.isEmpty) {
                                   return 'Provider must not be empty.\nDefault value is \'bsky.social\'';
                                 }
+                                return null;
                               },
                             ),
                             const SizedBox(height: 32),
